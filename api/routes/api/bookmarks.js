@@ -5,7 +5,7 @@ const router = express.Router();
 const Bookmark = require("../../models/Bookmark");
 
 // @route GET api/bookmarks
-// @desc  Get all Bookmarks
+// @desc  Read all Bookmarks
 // @access public
 router.get("/", (req, res) => {
     // read bookmarks from db and send json to listener
@@ -23,7 +23,20 @@ router.post("/", (req, res) => {
         author: req.body.author
     });
 
-    newBookmark.save().then((bookmarks) => res.json(bookmarks));
+    // save bookmark to db and respond with new db entry
+    newBookmark
+        .save()
+        .then((bookmarks) => res.json(bookmarks))
+        .catch((err) => console.log(err));
+});
+
+// @route UPDATE api/bookmarks
+// @desc  Update a Bookmark
+// @access public
+router.put("/:id", (req, res) => {
+    Bookmark.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        .then((bookmark) => res.json(bookmark))
+        .catch((err) => res.json(err));
 });
 
 // @route DELETE api/bookmarks
