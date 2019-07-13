@@ -26,7 +26,7 @@ router.post("/", (req, res) => {
     // save bookmark to db and respond with new db entry
     newBookmark
         .save()
-        .then((bookmarks) => res.json(bookmarks))
+        .then((bookmark) => res.json(bookmark))
         .catch((err) => console.log(err));
 });
 

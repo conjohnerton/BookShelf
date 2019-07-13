@@ -4,6 +4,7 @@ const express = require("express"),
 
 // capture model routes
 const bookmarks = require("./routes/api/bookmarks");
+const users = require("./routes/api/users");
 
 // set express configs
 const app = express();
@@ -17,6 +18,7 @@ mongoose
     .then(() => console.log("MongoDb Connected..."))
     .catch((err) => console.log(err));
 
+app.use("/api/users", users);
 app.use("/api/bookmarks", bookmarks);
 
 // config host port and instantiate listener
