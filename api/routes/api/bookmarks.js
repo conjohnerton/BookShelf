@@ -34,6 +34,7 @@ router.post("/", (req, res) => {
 // @desc  Update a Bookmark
 // @access public
 router.put("/:id", (req, res) => {
+    // responds with updated bookmark
     Bookmark.findByIdAndUpdate(req.params.id, req.body, { new: true })
         .then((bookmark) => res.json(bookmark))
         .catch((err) => res.json(err));
