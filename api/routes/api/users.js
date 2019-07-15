@@ -48,8 +48,8 @@ router.post("/", async (req, res) => {
         // add user to db
         const user = await newUser.save();
 
-        // get Authentication Token
-        const token = jwt.sign({ id: user.id }, config.get("jwtSecret"));
+        // get Authentication Token (currently expires in 1 hour)
+        const token = jwt.sign({ id: user.id }, config.get("jwtSecret"), { expiresIn: 3600 });
 
         // respond with Auth token and new user json
         res.json({
