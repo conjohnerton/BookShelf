@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcryptjs");
 
 const User = require("../../models/User");
 
@@ -15,15 +16,44 @@ router.get("/", (req, res) => {
 // @route POST api/users
 // @desc  Create new User
 // @access public
-router.post("/", (req, res) => {
-    const newUser = new User({
-        name: req.body.name
+router.post("/", async (req, res) => {
+    const { name, email, password } = req.body;
+
+    // check if required fields were not entered
+    if (!name || !email || !password) {
+        return res.status(400).json({ msg: "Please enter all fields" });
+    }
+
+    // check for existing user
+    User.findOne({ email }).then((user) => {
+        if (user) return res.status(400).json({ msg: "That email is already in use." });
     });
 
-    newUser
-        .save()
-        .then((user) => res.json(user))
-        .catch((err) => console.log(err));
+    // create new user object
+    const newUser = new User({
+        name,
+        email
+    });
+
+    try {
+        // hash password and insert into user object
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password, salt);
+        newUser.salt = salt;
+        newUser.password = hash;
+
+        // add user to db
+        const user = await newUser.save();
+        res.json({
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email
+            }
+        });
+    } catch (err) {
+        return res.status(404).json(err);
+    }
 });
 
 // @route UPDATE api/users
