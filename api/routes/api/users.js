@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
+const config = require("config");
+const jwt = require("jsonwebtoken");
 
 const User = require("../../models/User");
 
@@ -39,12 +41,19 @@ router.post("/", async (req, res) => {
         // hash password and insert into user object
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(password, salt);
+
         newUser.salt = salt;
         newUser.password = hash;
 
         // add user to db
         const user = await newUser.save();
+
+        // get Authentication Token
+        const token = jwt.sign({ id: user.id }, config.get("jwtSecret"));
+
+        // respond with Auth token and new user json
         res.json({
+            token,
             user: {
                 id: user.id,
                 name: user.name,

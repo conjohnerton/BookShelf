@@ -1,12 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const config = require("config");
 
 // set express configs
 const app = express();
 app.use(express.json());
 
 // set db configs and connect to db
-const db = require("./config/default.json").mongoURI;
+const db = config.get("mongoURI");
 mongoose
     .connect(db, { useNewUrlParser: true, useFindAndModify: false })
     .then(() => console.log("MongoDb Connected..."))
