@@ -10,6 +10,7 @@ const Bookmark = require("../../models/Bookmark");
 router.get("/", (req, res) => {
     // read bookmarks from db and send json to listener
     Bookmark.find()
+        .sort({ date: -1 }) // descending date
         .then((bookmarks) => res.json(bookmarks))
         .catch((err) => console.log(err));
 });

@@ -1,15 +1,9 @@
-const express = require("express"),
-    bodyParser = require("body-parser"),
-    mongoose = require("mongoose");
-
-// capture model routes
-const bookmarks = require("./routes/api/bookmarks");
-const users = require("./routes/api/users");
+const express = require("express");
+const mongoose = require("mongoose");
 
 // set express configs
 const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
 // set db configs and connect to db
 const db = require("./config/keys").mongoURI;
@@ -18,8 +12,8 @@ mongoose
     .then(() => console.log("MongoDb Connected..."))
     .catch((err) => console.log(err));
 
-app.use("/api/users", users);
-app.use("/api/bookmarks", bookmarks);
+app.use("/api/users", require("./routes/api/users"));
+app.use("/api/bookmarks", require("./routes/api/bookmarks"));
 
 // config host port and instantiate listener
 const port = process.env.PORT || 5000;
