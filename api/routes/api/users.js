@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
+const authentication = require("../../middleware/auth");
 
 const User = require("../../models/User");
 
@@ -80,7 +81,7 @@ router.put("/:id", (req, res) => {
 // @route DELETE api/users
 // @desc  Delete User
 // @access public
-router.delete("/:id", (req, res) => {
+router.delete("/:id", authentication, (req, res) => {
     User.findById(req.params.id)
         .then((user) => user.remove())
         .then(() => res.json({ success: true }))
