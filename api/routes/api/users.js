@@ -12,7 +12,7 @@ const User = require("../../models/User");
 // @route GET api/users
 // @desc  Read all users
 // @access public
-// FOR DEV USE ONLY, DELETE BEFORE PRODUCTION
+// FOR DEV USE ONLY, DELETE BEFORE PRODUCTION (Or figure out some auth path for this)
 router.get("/", (req, res) => {
     User.find()
         .then((users) => res.json(users))
@@ -77,29 +77,33 @@ router.put("/", authentication, async (req, res) => {
     if (req.body.password)
         return res.status(400).json({ msg: "Try this on the change password form instead!" });
 
-    // check if email is in use already, reject request if so (if email is in body)
-    if (req.body.email) {
-        const existingUser = await User.findOne({ email: req.body.email });
+    try {
+        // check if email is in use already, reject request if so (if email is in body)
+        if (req.body.email) {
+            const existingUser = await User.findOne({ email: req.body.email });
 
-        if (existingUser) return res.status(400).json({ msg: "That email is already in use." });
+            if (existingUser) return res.status(400).json({ msg: "That email is already in use." });
+        }
+
+        const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true });
+
+        return res.json({ user, success: true });
+    } catch (err) {
+        return res.json({ err, success: false });
     }
-
-    User.findByIdAndUpdate(req.user.id, req.body, { new: true })
-        .then((user) => res.json({ user, success: true }))
-        .catch((err) => {
-            console.log(err);
-            res.json({ success: false });
-        });
 });
 
 // @route DELETE api/users
 // @desc  Delete User
 // @access public
-router.delete("/", authentication, (req, res) => {
-    User.findById(req.user.id)
-        .then((user) => user.remove())
-        .then(() => res.json({ success: true }))
-        .catch((err) => console.log(err), () => res.json({ success: false }));
+router.delete("/", authentication, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        await user.remove();
+        return res.json({ success: true });
+    } catch (err) {
+        return res.json({ success: false });
+    }
 });
 
 module.exports = router;
