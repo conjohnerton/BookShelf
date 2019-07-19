@@ -14,6 +14,8 @@ function authenticate(req, res, next) {
         const decodedToken = jwt.verify(token, config.get("jwtSecret"));
 
         // add user located in decodedToken to headers
+        // (allows for accessing current user data in any authenticated route)
+        // THIS IS REALLY AWESOME
         req.user = decodedToken;
         next();
     } catch (err) {

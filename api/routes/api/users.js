@@ -7,9 +7,12 @@ const authentication = require("../../middleware/auth");
 
 const User = require("../../models/User");
 
+// TODO: Create put route for user password updates
+
 // @route GET api/users
 // @desc  Read all users
 // @access public
+// FOR DEV USE ONLY, DELETE BEFORE PRODUCTION
 router.get("/", (req, res) => {
     User.find()
         .then((users) => res.json(users))
@@ -50,13 +53,13 @@ router.post("/", async (req, res) => {
         const user = await newUser.save();
 
         // get Authentication Token (currently expires in 1 hour)
-        const token = jwt.sign({ id: user.id }, config.get("jwtSecret"), { expiresIn: 3600 });
+        const token = jwt.sign({ id: user._id }, config.get("jwtSecret"), { expiresIn: 3600 });
 
         // respond with Auth token and new user json
         res.json({
             token,
             user: {
-                id: user.id,
+                id: user._id,
                 name: user.name,
                 email: user.email
             }
@@ -69,9 +72,20 @@ router.post("/", async (req, res) => {
 // @route UPDATE api/users
 // @desc   update User
 // @access public
-router.put("/:id", (req, res) => {
-    User.findByIdAndUpdate(req.params.id, req.body, { new: true })
-        .then((user) => res.json(user))
+router.put("/", authentication, async (req, res) => {
+    // reject password changes on this route
+    if (req.body.password)
+        return res.status(400).json({ msg: "Try this on the change password form instead!" });
+
+    // check if email is in use already, reject request if so (if email is in body)
+    if (req.body.email) {
+        const existingUser = await User.findOne({ email: req.body.email });
+
+        if (existingUser) return res.status(400).json({ msg: "That email is already in use." });
+    }
+
+    User.findByIdAndUpdate(req.user.id, req.body, { new: true })
+        .then((user) => res.json({ user, success: true }))
         .catch((err) => {
             console.log(err);
             res.json({ success: false });
@@ -81,8 +95,8 @@ router.put("/:id", (req, res) => {
 // @route DELETE api/users
 // @desc  Delete User
 // @access public
-router.delete("/:id", authentication, (req, res) => {
-    User.findById(req.params.id)
+router.delete("/", authentication, (req, res) => {
+    User.findById(req.user.id)
         .then((user) => user.remove())
         .then(() => res.json({ success: true }))
         .catch((err) => console.log(err), () => res.json({ success: false }));
