@@ -8,6 +8,7 @@ const authentication = require("../../middleware/auth");
 const User = require("../../models/User");
 
 // TODO: Create put route for user password updates
+// TODO: Make email strings all lowercase before adding to DB
 
 // @route GET api/users
 // @desc  Read all users

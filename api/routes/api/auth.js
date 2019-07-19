@@ -7,6 +7,8 @@ const authenticate = require("../../middleware/auth");
 
 const User = require("../../models/User");
 
+// TODO: make all input email strings lowercase before sign in
+
 // @route POST api/auth
 // @desc  Authenticate user
 // @access public
@@ -39,7 +41,7 @@ router.post("/", async (req, res) => {
         res.json({
             token,
             user: {
-                id: user.id,
+                id: user._id,
                 name: user.name,
                 email: user.email
             }

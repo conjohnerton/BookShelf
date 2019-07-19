@@ -5,19 +5,19 @@ const authenticate = require("../../middleware/auth");
 const User = require("../../models/User");
 const Group = require("../../models/Group");
 
+// TODO: post bookmark to group method
+//       add user to group
+
 // get current users groups
 router.get("/", authenticate, async (req, res) => {
     try {
-        const userGroups = User.findById(req.user.id).populate("Groups");
+        const userGroups = await User.findById(req.user.id).populate("groups");
         res.json(userGroups);
     } catch (err) {
         return res.json(err);
     }
 });
 
-// TODO: create group method
-//       post bookmark to group method
-//       add user to group??
 router.post("/", authenticate, async (req, res) => {
     try {
         // find user from auth token userId
@@ -35,6 +35,7 @@ router.post("/", authenticate, async (req, res) => {
         user.groups.push(newGroup);
         await user.save();
 
+        // TODO: Figure out what the heck to respond with
         return res.json({
             user: {
                 name: user.name,
