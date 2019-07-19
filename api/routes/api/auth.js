@@ -32,8 +32,8 @@ router.post("/", async (req, res) => {
             return res.status(400).json({ msg: "You have entered the wrong passoword :(" });
         }
 
-        // generate json web token
-        const token = await jwt.sign({ id: user.id }, config.get("jwtSecret"), { expiresIn: 3600 });
+        // generate json web token (can set expiresIn option if desired)
+        const token = await jwt.sign({ id: user.id }, config.get("jwtSecret"));
 
         // respond with Auth token and new user json
         res.json({
