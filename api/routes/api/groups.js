@@ -6,11 +6,8 @@ const User = require("../../models/User");
 const Group = require("../../models/Group");
 const Bookmark = require("../../models/Bookmark");
 
-// TODO: post bookmark to group method
-//       add user to group
+// TODO: add user to group
 //       remove group from user list
-//       add existing group
-//       test delete group method for bugs
 //       eventually check to see if user needs to be validated for group actions
 
 // get current users groups
@@ -50,6 +47,30 @@ router.post("/", authenticate, async (req, res) => {
         });
     } catch (err) {
         console.log(err);
+        return res.json({ success: false });
+    }
+});
+
+// NEEDS TESTING
+// add member to group
+router.post("/join", authenticate, async (req, res) => {
+    if (!req.body.groupCode) {
+        return res.json({ msg: "Please enter a group code." });
+    }
+
+    try {
+        // get group and check existence
+        let group = Group.findById(req.body.groupCode);
+
+        if (!group) {
+            return res.json({ msg: "There is no group with that group code." });
+        }
+
+        group.members.push(req.user);
+        group = group.save();
+
+        return res.json({ success: true });
+    } catch (err) {
         return res.json({ success: false });
     }
 });
@@ -106,10 +127,15 @@ router.post("/:id/bookmarks", authenticate, async (req, res) => {
     }
 });
 
+// NEEDS TESTING
 // get members of group
-router.get("/:id/members");
-
-// add member to group
-router.post("/:id/members");
+router.get("/:id/members", authenticate, async (req, res) => {
+    try {
+        const group = await Group.findById(req.params.id).populate("User");
+        return res.json(group);
+    } catch (err) {
+        return res.json(err);
+    }
+});
 
 module.exports = router;
