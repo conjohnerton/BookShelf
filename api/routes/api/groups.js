@@ -4,9 +4,14 @@ const authenticate = require("../../middleware/auth");
 
 const User = require("../../models/User");
 const Group = require("../../models/Group");
+const Bookmark = require("../../models/Bookmark");
 
 // TODO: post bookmark to group method
 //       add user to group
+//       remove group from user list
+//       add existing group
+//       test delete group method for bugs
+//       eventually check to see if user needs to be validated for group actions
 
 // get current users groups
 router.get("/", authenticate, async (req, res) => {
@@ -18,22 +23,23 @@ router.get("/", authenticate, async (req, res) => {
     }
 });
 
+// create a new group under current user
 router.post("/", authenticate, async (req, res) => {
     try {
         // find user from auth token userId
-        const user = await User.findById(req.user.id);
+        let user = await User.findById(req.user.id);
 
         // get Group name from body and create Group
-        const newGroup = new Group({
+        let newGroup = new Group({
             name: req.body.name,
             members: [user._id]
         });
 
-        await newGroup.save();
+        newGroup = await newGroup.save();
 
         // add group to current user and save it
         user.groups.push(newGroup);
-        await user.save();
+        user = await user.save();
 
         // TODO: Figure out what the heck to respond with
         return res.json({
@@ -47,5 +53,63 @@ router.post("/", authenticate, async (req, res) => {
         return res.json({ success: false });
     }
 });
+
+// NEEDS TESTING
+// delete group
+router.delete("/:id", authenticate, async (req, res) => {
+    try {
+        let group = await User.findById(req.params.id).populate("Bookmark");
+
+        // delete all bookmarks contained in the group
+        for (let bookmark of group.bookmarks) {
+            group.bookmarks.id(bookmark._id).remove();
+        }
+
+        await group.remove();
+
+        return res.json({ success: true });
+    } catch (err) {
+        return res.json({ err, success: true });
+    }
+});
+
+// get all Bookmarks from group
+router.get("/:id/bookmarks", authenticate, async (req, res) => {
+    try {
+        const group = await Group.findById(req.params.id).populate("Bookmark");
+        res.json(group);
+    } catch (err) {
+        return res.json(err);
+    }
+});
+
+// NEEDS TESTING
+// post bookmark in group
+router.post("/:id/bookmarks", authenticate, async (req, res) => {
+    try {
+        let group = await Group.findById(req.params.id);
+
+        const newBookmark = new Bookmark({
+            title: req.body.title,
+            author: req.user,
+            body: req.body.text,
+            url: req.body.url
+        });
+
+        await newBookmark.save();
+        group.bookmarks.push(newBookmark);
+        group = await group.save();
+
+        return res.json({ success: true });
+    } catch (err) {
+        return res.json({ err, success: false });
+    }
+});
+
+// get members of group
+router.get("/:id/members");
+
+// add member to group
+router.post("/:id/members");
 
 module.exports = router;

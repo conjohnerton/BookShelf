@@ -9,6 +9,7 @@ const User = require("../../models/User");
 
 // TODO: Create put route for user password updates
 // TODO: Make email strings all lowercase before adding to DB
+// TODO: Delete all bookmarks from user, when user account is deleted
 
 // @route GET api/users
 // @desc  Read all users
