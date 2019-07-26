@@ -15,7 +15,8 @@ mongoose
 
 app.use("/api/auth", require("./routes/api/auth"));
 app.use("/api/users", require("./routes/api/users"));
-app.use("/api/groups", require("./routes/api/groups"));
+app.use("/api/userGroups", require("./routes/api/userGroups"));
+app.use("/api/innerGroups", require("./routes/api/innerGroups"));
 app.use("/api/bookmarks", require("./routes/api/bookmarks"));
 
 // config host port and instantiate listener
