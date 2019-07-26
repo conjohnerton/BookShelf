@@ -94,6 +94,7 @@ router.put("/:id", authenticate, async (req, res) => {
         // remove group from user group list
         user = user.groups.filter((id) => id != req.params.id);
         user = await user.save();
+
         return res.json({ user, success: true });
     } catch (err) {
         return res.json({ err, success: false });

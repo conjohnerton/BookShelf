@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const GroupSchema = new Schema({
     name: { type: String, required: true },
-    groupCode: { type: Number },
+    groupCode: { type: String },
     bookmarks: [
         {
             type: Schema.Types.ObjectId,
