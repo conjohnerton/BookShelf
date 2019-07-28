@@ -85,17 +85,16 @@ router.put("/", authenticate, async (req, res) => {
     }
 });
 
-// NEEDS TESTING
 // remove group from user listing
 router.delete("/", authenticate, async (req, res) => {
     try {
+        // remove member from group members array
         const group = await Group.findById(req.body.id);
         group.members = group.members.filter((_id) => _id != req.user.id);
         await group.save();
 
-        let user = await User.findById(req.user.id);
-
         // remove group from user group list
+        let user = await User.findById(req.user.id);
         user.groups = user.groups.filter((_id) => _id != req.body.id);
         user = await user.save();
 
