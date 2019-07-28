@@ -14,8 +14,8 @@ const User = require("../../models/User");
 // @route GET api/users
 // @desc  Read all users
 // @access public
-// FOR DEV USE ONLY, DELETE BEFORE PRODUCTION (Or figure out some auth path for this)
-router.get("/", (req, res) => {
+// FOR DEV USE ONLY, DELETE BEFORE PRODUCTION
+router.get("/", async (req, res) => {
     User.find()
         .then((users) => res.json(users))
         .catch((err) => console.log(err));
