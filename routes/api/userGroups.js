@@ -118,7 +118,7 @@ router.delete("/:id", authenticate, async (req, res) => {
         user.groups = user.groups.filter((id) => id != req.params.id);
         user = await user.save();
 
-        let group = await Group.findById(req.params.id).populate("Bookmark");
+        let group = await Group.findById(req.params.id).populate("bookmarks");
 
         // just to be safe, check if the group even exists in the db
         if (!group) {
