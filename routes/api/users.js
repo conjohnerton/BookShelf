@@ -15,10 +15,13 @@ const User = require("../../models/User");
 // @desc  Read all users
 // @access public
 // FOR DEV USE ONLY, DELETE BEFORE PRODUCTION
-router.get("/", (req, res) => {
-    User.find()
-        .then((users) => res.json(users))
-        .catch((err) => console.log(err));
+router.get("/", async (req, res) => {
+    try {
+        const users = await User.find().populate("groups");
+        return res.json(users);
+    } catch (err) {
+        return res.json(err);
+    }
 });
 
 // @route POST api/users
